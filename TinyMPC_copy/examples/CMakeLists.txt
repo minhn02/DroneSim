@@ -1,0 +1,4 @@
+# add_executable(example_quadrotor_hovering_cpu example_quadrotor_hovering_cpu.cpp)
+# target_link_libraries(example_quadrotor_hovering_cpu LINK_PUBLIC tinympc matlib)
+add_executable(example_quadrotor_tracking_cpu example_quadrotor_tracking_cpu.cpp)
+target_link_libraries(example_quadrotor_tracking_cpu LINK_PUBLIC tinympc matlib)

@@ -37,9 +37,7 @@ template<typename Scalar_, int Rows_, int Cols_,
 
 public:
     Scalar_ _data[MaxRows_ * MaxCols_];
-    Scalar_ *data;
-    Scalar_ *vector[Options_ & RowMajor ? Rows_ : Cols_];
-    Scalar_ **array;
+    float *data;
     int rows, cols, outer, inner;
 
     void _Matrix(int rows_, int cols_) {
@@ -53,20 +51,18 @@ public:
             inner = rows_;
         }
         data = _data;
-        array = &vector[0];
-        for (int i = 0; i < outer; ++i)
-            array[i] = (Scalar_ *)(&_data[i * inner]);
     }
 
     // Constructor
     Matrix() {
         _Matrix(Rows_, Cols_);
-        for (int i = 0; i < outer * inner; ++i)
+        for (int i = 0; i < outer * inner; ++i) {
             data[i] = 0;
+        }
     }
 
     // Copy Constructor
-    Matrix(const Matrix& other) {
+    Matrix(Matrix& other) {
         assert(other.rows <= MaxRows_ && other.cols <= MaxCols_);
         _Matrix(Rows_, Cols_);
         matcopy(other.data, data, outer, inner);
@@ -75,31 +71,45 @@ public:
     // Copy Constructor
     Matrix(Scalar_ *data) {
         _Matrix(Rows_, Cols_);
-        matsetv(data, this->data, outer, inner);
+        matsetv(this->data, data, outer, inner);
     }
 
     // Column if ColMajor
-    Scalar_ *col(int col) {
+    void col(int col, Scalar_ *column) {
         assert(!(Options_ & RowMajor));
-        return vector[col];
+        
+        for (int i = 0; i < rows; i++) {
+            column[i] = data[i * cols + col];
+        }
     }
 
-    // Row if RowMajor
-    Scalar_ *row(int row) {
-        assert(Options_ & RowMajor);
-        return vector[row];
+    void set_col(int col, Scalar_* column) {
+        for (int i = 0; i < rows; i++) {
+            data[i * cols + col] = column[i];
+        }
     }
 
     // Assignment Operator
     // TODO: it has a bug in the last statement
-    virtual Matrix& operator=(const Matrix *other) {
+    // virtual Matrix& operator=(const Matrix *other) {
+    //     if (this == other) return *this;
+    //     matcopy(other->data, data, outer, inner);
+    //     return *this;
+    // }
+
+    // // Assignment Operator
+    // virtual Matrix& operator=(const Scalar_ f) {
+    //     matset(data, f, outer, inner);
+    //     return *this;
+    // }
+
+    Matrix& assign(const Matrix *other) {
         if (this == other) return *this;
         matcopy(other->data, data, outer, inner);
         return *this;
     }
 
-    // Assignment Operator
-    virtual Matrix& operator=(const Scalar_ f) {
+    Matrix& assign (const Scalar_ f) {
         matset(data, f, outer, inner);
         return *this;
     }
@@ -112,36 +122,13 @@ public:
 
     // Access Operator
     Scalar_& operator()(int row, int col) {
-        // Access elements based on storage order
-        if (Options_ & RowMajor) {
-            return array[col][row];
-        } else {
-            return array[row][col];
-        }
+        return data[rows*row + col];
     }
 
-    Scalar_ checksum() {
-        Scalar_ sum = 0;
-        for (int i = 0; i < outer; i++) {
-            for (int j = 0; j < inner; j++) {
-                sum += array[i][j];
-	    }
-        }
-        return sum;
-    }
-
-    void print(const char *type, const char *name) {
-        print_array_2d(data, outer, inner, type, name);
-    }
-
-    virtual void toString() {
-        printf("const array: %x rows: %d cols: %d outer: %d inner: %d (%d, %d)\n", data, rows, cols, outer, inner, Rows_, Cols_);
-    }
+    // virtual void toString() {
+    //     printf("const array: %x rows: %d cols: %d outer: %d inner: %d (%d, %d)\n", data, rows, cols, outer, inner, Rows_, Cols_);
+    // }
 };
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef Matrix<tinytype, NSTATES, 1> tiny_VectorNx;
 typedef Matrix<tinytype, NINPUTS, 1> tiny_VectorNu;
@@ -248,12 +235,9 @@ typedef struct
  */
 typedef struct
 {
-    TinySettings *settings; // Problem settings
-    TinyCache *cache;       // Problem cache
-    TinyWorkspace *work;    // Solver workspace
+    TinySettings settings; // Problem settings
+    TinyCache cache;       // Problem cache
+    TinyWorkspace work;    // Solver workspace
 } TinySolver;
 
-#ifdef __cplusplus
-}
-#endif
 #endif

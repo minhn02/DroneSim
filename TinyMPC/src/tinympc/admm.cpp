@@ -18,6 +18,7 @@ int tiny_solve(TinySolver *solver)
     update_linear_cost(solver);
     for (int i = 0; i < solver->settings->max_iter; i++)
     {
+        printf("iteration %d\n", i);
         // Solve linear system with Riccati and roll out to get new trajectory
         update_primal(solver);
         // Project slack variables into feasible domain
@@ -33,6 +34,11 @@ int tiny_solve(TinySolver *solver)
             dual_residual_state(solver);
             primal_residual_input(solver);
             dual_residual_input(solver);
+            printf("primal residual state: %f\n",solver->work->primal_residual_state);
+            printf("dual residual state: %f\n",solver->work->dual_residual_state);
+            printf("primal residual input: %f\n",solver->work->primal_residual_input);
+            printf("dual residual input: %f\n",solver->work->dual_residual_input);
+
             if (solver->work->primal_residual_state < solver->settings->abs_pri_tol &&
                 solver->work->primal_residual_input < solver->settings->abs_pri_tol &&
                 solver->work->dual_residual_state < solver->settings->abs_dua_tol &&

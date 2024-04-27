@@ -32,6 +32,11 @@ inline void forward_pass_1(TinySolver *solver, int i) {
 #endif
     matadd(solver->work->u1.data, solver->work->d.col(i), solver->work->u2.data, 1, NINPUTS);
     matneg(solver->work->u2.data, solver->work->u.col(i), 1, NINPUTS);
+
+    // printf("actual d col data [%f, %f, %f, %f]\n", solver->work->d.col(i)[0], solver->work->d.col(i)[1], solver->work->d.col(i)[2], solver->work->d.col(i)[3]);
+
+    // printf("setting u col %d to [%f %f %f %f]\n", i, solver->work->u.col(i)[0], solver->work->u.col(i)[1], solver->work->u.col(i)[2], solver->work->u.col(i)[3]);
+    // printf("actual u col data [%f, %f, %f, %f]\n", solver->work->u.col(i)[0], solver->work->u.col(i)[1], solver->work->u.col(i)[2], solver->work->u.col(i)[3]);
 }
 
 // x[:, i+1] = Adyn * x[:, i] + Bdyn * u[:, i]
