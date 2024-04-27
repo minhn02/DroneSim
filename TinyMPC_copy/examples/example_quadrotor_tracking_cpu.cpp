@@ -65,7 +65,13 @@ void tracking(float observations[12], float inputs[4])
     tinytype Xref_total[NSTATES][NTOTAL];
 
     set((tinytype*)Xref_total, Xref_data, NSTATES, NTOTAL);
-    set((tinytype*)tiny::Xref, (tinytype*)Xref_total, NSTATES, NHORIZON);
+    // manually set Xref because of different dimensions of Xref_total
+    // for (int i = 0; i < NHORIZON; i++) {
+    //     for (int j = 0; j < NSTATES; j++) {
+    //         tiny::Xref[i][j] = Xref_total[i][j];
+    //     }
+    // }
+    matsetv((tinytype*)tiny::Xref, (tinytype*)Xref_data, NHORIZON, NSTATES);
 
     // current and next simulation states
     float x0[NSTATES];

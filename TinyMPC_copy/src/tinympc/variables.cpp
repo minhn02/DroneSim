@@ -1,16 +1,17 @@
 #include "variables.hpp"
+#include "glob_opts.hpp"
 
 namespace tiny {
 
 // TinyCache
 tinytype rho;
-tinytype Kinf[NINPUTS][NHORIZON-1];
-tinytype KinfT[NHORIZON-1][NINPUTS];
+tinytype Kinf[NHORIZON-1][NINPUTS];
+tinytype KinfT[NINPUTS][NHORIZON-1];
 tinytype Pinf[NSTATES][NSTATES];
 tinytype PinfT[NSTATES][NSTATES];
 tinytype Quu_inv[NINPUTS][NINPUTS];
 tinytype AmBKt[NSTATES][NSTATES];
-tinytype coeff_d2p[NSTATES][NINPUTS];
+tinytype coeff_d2p[NINPUTS][NSTATES];
 
 // TinySetting
 tinytype abs_pri_tol;
@@ -23,26 +24,26 @@ int en_input_bound;
 // TinyWorkspace
 
 // State and input
-tinytype x[NSTATES][NHORIZON];
-tinytype u[NINPUTS][NHORIZON-1];
+tinytype x[NHORIZON][NSTATES];
+tinytype u[NHORIZON-1][NINPUTS];
 
 // Linear control cost terms
-tinytype q[NSTATES][NHORIZON];
-tinytype r[NINPUTS][NHORIZON-1];
+tinytype q[NHORIZON][NSTATES];
+tinytype r[NHORIZON-1][NINPUTS];
 
 // Linear Riccati backward pass terms
-tinytype p[NSTATES][NHORIZON];
-tinytype d[NINPUTS][NHORIZON-1];
+tinytype p[NHORIZON][NSTATES];
+tinytype d[NHORIZON-1][NINPUTS];
 
 // Auxiliary variables
-tinytype v[NSTATES][NHORIZON];
-tinytype vnew[NSTATES][NHORIZON];
-tinytype z[NINPUTS][NHORIZON-1];
-tinytype znew[NINPUTS][NHORIZON-1];
+tinytype v[NHORIZON][NSTATES];
+tinytype vnew[NHORIZON][NSTATES];
+tinytype z[NHORIZON-1][NINPUTS];
+tinytype znew[NHORIZON-1][NINPUTS];
 
 // Dual variables
-tinytype g[NSTATES][NHORIZON];
-tinytype y[NINPUTS][NHORIZON-1];
+tinytype g[NHORIZON][NSTATES];
+tinytype y[NHORIZON-1][NINPUTS];
 
 tinytype primal_residual_state;
 tinytype primal_residual_input;
@@ -56,15 +57,15 @@ tinytype Qf[NSTATES];
 tinytype R[NINPUTS];
 tinytype Adyn[NSTATES][NSTATES];
 tinytype AdynT[NSTATES][NSTATES];
-tinytype Bdyn[NINPUTS][NINPUTS];
-tinytype BdynT[NINPUTS][NINPUTS];
+tinytype Bdyn[NINPUTS][NSTATES];
+tinytype BdynT[NSTATES][NINPUTS];
 
-tinytype u_min[NINPUTS][NHORIZON-1];
-tinytype u_max[NINPUTS][NHORIZON-1];
-tinytype x_min[NSTATES][NHORIZON];
-tinytype x_max[NSTATES][NHORIZON];
-tinytype Xref[NSTATES][NHORIZON];   // Nx x Nh
-tinytype Uref[NINPUTS][NHORIZON-1]; // Nu x Nh-1
+tinytype u_min[NHORIZON-1][NINPUTS];
+tinytype u_max[NHORIZON-1][NINPUTS];
+tinytype x_min[NHORIZON][NSTATES];
+tinytype x_max[NHORIZON][NSTATES];
+tinytype Xref[NHORIZON][NSTATES];   // Nh x Nx
+tinytype Uref[NHORIZON-1][NINPUTS]; // Nh-1 x Nu
 
 // Temporaries
 tinytype Qu[NINPUTS];
@@ -73,10 +74,10 @@ tinytype u2[NINPUTS];
 tinytype x1[NSTATES];
 tinytype x2[NSTATES];
 tinytype x3[NSTATES];
-tinytype m1[NINPUTS][NHORIZON-1];
-tinytype m2[NINPUTS][NHORIZON-1];
-tinytype m3[NINPUTS][NHORIZON-1];
-tinytype s1[NSTATES][NHORIZON];
-tinytype s2[NSTATES][NHORIZON];
+tinytype m1[NHORIZON-1][NINPUTS];
+tinytype m2[NHORIZON-1][NINPUTS];
+tinytype m3[NHORIZON-1][NINPUTS];
+tinytype s1[NHORIZON][NSTATES];
+tinytype s2[NHORIZON][NSTATES];
 
 }
