@@ -1,0 +1,9 @@
+[submodule "Accelerated-TinyMPC"]
+	path = Accelerated-TinyMPC
+	url = git@github.com:ucb-bar/Accelerated-TinyMPC.git
+[submodule "TinyMPC_HLS/hlslib"]
+	path = TinyMPC_HLS/hlslib
+	url = https://github.com/definelicht/hlslib.git
+[submodule "gym-pybullet-drones"]
+	path = gym-pybullet-drones
+	url = https://github.com/utiasDSL/gym-pybullet-drones.git

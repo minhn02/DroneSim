@@ -59,9 +59,7 @@ DEFAULT_OUTPUT_FOLDER = 'results'
 DEFAULT_COLAB = False
 
 def run_tinympc_system(observation):
-    # base_command = "../TinyMPC/build/examples/quadrotor_hovering"
-    # base_command = "../TinyMPC/build/examples/quadrotor_tracking"
-    base_command = "../Accelerated-TinyMPC/build/examples/example_quadrotor_tracking_cpu"
+    base_command = "../TinyMPC_HLS/build/examples/quadrotor_tracking"
     formated_obs = extract_state_inputs(observation)
     full_command = f"{base_command} {formated_obs}"
     result = subprocess.run(full_command, shell=True, text=True, capture_output=True)
