@@ -5,8 +5,8 @@ namespace tiny {
 
 // TinyCache
 tinytype rho;
-tinytype Kinf[NHORIZON-1][NINPUTS];
-tinytype KinfT[NINPUTS][NHORIZON-1];
+tinytype Kinf[NSTATES][NINPUTS];
+tinytype KinfT[NINPUTS][NSTATES];
 tinytype Pinf[NSTATES][NSTATES];
 tinytype PinfT[NSTATES][NSTATES];
 tinytype Quu_inv[NINPUTS][NINPUTS];

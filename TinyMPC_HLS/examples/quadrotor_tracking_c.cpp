@@ -7,8 +7,8 @@
 // Inputs: u1, u2, u3, u4 (motor thrust 0-1, order from Crazyflie)
 // phi, theta, psi are NOT Euler angles, they are Rodiguez parameters
 // check this paper for more details: https://roboticexplorationlab.org/papers/planning_with_attitude.pdf
-
 #include <stdio.h>
+#include <iostream>
 
 #include <tinympc/admm.hpp>
 #include "matlib_cpu.h"
@@ -20,8 +20,14 @@
 extern "C"
 {
 
-void tracking(float observations[12], float inputs[4])
+int main(int arc, char* argv[])
 {
+    // get current obs as arguments
+    float observations[12];
+    for (int i = 0; i < 12; ++i) {
+        observations[i] = std::stof(argv[i + 1]);
+    }
+
     // Map array from problem_data (array in row-major order)
     tiny::rho = rho_value;
     set((tinytype*)tiny::Kinf, Kinf_data, NINPUTS, NSTATES);
@@ -36,7 +42,7 @@ void tracking(float observations[12], float inputs[4])
     set((tinytype*)tiny::Bdyn, Bdyn_data, NSTATES, NINPUTS);
     transpose((tinytype*)tiny::Bdyn, (tinytype*)tiny::BdynT, NSTATES, NINPUTS);
     set((tinytype*)tiny::Q, Q_data, NSTATES, 1);
-    set((tinytype*)tiny::R, R_data, NSTATES, 1);
+    set((tinytype*)tiny::R, R_data, NINPUTS, 1);
 
     // Valid range for inputs and states
     set((tinytype*)tiny::u_min, -0.583, NINPUTS, NHORIZON-1);
@@ -102,18 +108,12 @@ void tracking(float observations[12], float inputs[4])
         tiny_solve();
         float u_col_0[NINPUTS];
         get_col((tinytype*)tiny::u, u_col_0, 0, NINPUTS, NHORIZON-1);
-        for (int i = 0; i < NINPUTS; i++) {
-            inputs[i] = u_col_0[i];
-        }
-        return;
-    }
-}
 
-int main() {
-    float observations[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    float inputs[4];
-    tracking(observations, inputs);
-    printf("inputs: %f, %f, %f, %f\n", inputs[0], inputs[1], inputs[2], inputs[3]);
+        // print to terminal for simulator to capture output
+        printf ("%f %f %f %f\n", u_col_0[0], u_col_0[1], u_col_0[2], u_col_0[3]);
+        
+        return 0;
+    }
 }
 
 } /* extern "C" */

@@ -1,0 +1,2 @@
+add_executable(quadrotor_tracking quadrotor_tracking_c.cpp)
+target_link_libraries(quadrotor_tracking LINK_PUBLIC tinympc matlib)
