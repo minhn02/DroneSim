@@ -18,8 +18,22 @@
 extern "C"
 {
 
-void tracking(float observations[12], float inputs[4])
+void tracking(float* observations, float* inputs)
 {
+#pragma HLS INTERFACE m_axi port = observations bundle = gmem0
+#pragma HLS INTERFACE m_axi port = inputs bundle = gmem1
+
+#pragma HLS array_partition variable=tiny::Adyn type=block factor=4
+#pragma HLS array_partition variable=tiny::AdynT type=block factor=4
+#pragma HLS array_partition variable=tiny::Bdyn type=block factor=4
+#pragma HLS array_partition variable=tiny::Xref type=block factor=4
+#pragma HLS array_partition variable=tiny::PinfT type=block factor=4
+#pragma HLS array_partition variable=tiny::KinfT type=block factor=4
+#pragma HLS array_partition variable=tiny::Kinf type=block factor=4
+#pragma HLS array_partition variable=tiny::Quu_inv type=block factor=4
+#pragma HLS array_partition variable=Kinf_data type=block factor=4
+
+
     // Map array from problem_data (array in row-major order)
     tiny::rho = rho_value;
     set((tinytype*)tiny::Kinf, Kinf_data, NINPUTS, NSTATES);
@@ -63,12 +77,6 @@ void tracking(float observations[12], float inputs[4])
     tinytype Xref_total[NSTATES][NTOTAL];
 
     set((tinytype*)Xref_total, Xref_data, NSTATES, NTOTAL);
-    // manually set Xref because of different dimensions of Xref_total
-    // for (int i = 0; i < NHORIZON; i++) {
-    //     for (int j = 0; j < NSTATES; j++) {
-    //         tiny::Xref[i][j] = Xref_total[i][j];
-    //     }
-    // }
     matsetv((tinytype*)tiny::Xref, (tinytype*)Xref_data, NHORIZON, NSTATES);
 
     // current and next simulation states

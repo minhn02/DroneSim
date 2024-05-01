@@ -4,15 +4,20 @@ project(TinyMPC_HLS)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/hlslib/cmake)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Vitis REQUIRED)
+find_package(OpenCL REQUIRED)
 
 include_directories(include/matlib)
 include_directories(include/tinympc)
 add_subdirectory(src)
 add_subdirectory(examples)
 
-include_directories(${Vitis_INCLUDE_DIRS})
+include_directories(${CMAKE_BINARY_DIR} SYSTEM hlslib/include ${Vitis_INCLUDE_DIRS} )
+
+add_executable(trackingHost src/trackingHost.cpp)
+target_link_libraries(trackingHost ${Vitis_LIBRARIES})
 
 # Will populate the "hw", "hw_emu", and "synthesis" targets
 add_vitis_kernel(tracking
