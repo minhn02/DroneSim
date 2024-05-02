@@ -64,56 +64,35 @@ int main(int arc, char* argv[])
     tiny::en_input_bound = 1;
     tiny::en_state_bound = 1;
 
-
-    tinytype v1[NSTATES];
-    tinytype v2[NSTATES];
-
     tinytype Xref_total[NSTATES][NTOTAL];
 
     set((tinytype*)Xref_total, Xref_data, NSTATES, NTOTAL);
-    // manually set Xref because of different dimensions of Xref_total
-    // for (int i = 0; i < NHORIZON; i++) {
-    //     for (int j = 0; j < NSTATES; j++) {
-    //         tiny::Xref[i][j] = Xref_total[i][j];
-    //     }
-    // }
     matsetv((tinytype*)tiny::Xref, (tinytype*)Xref_data, NHORIZON, NSTATES);
 
     // current and next simulation states
     float x0[NSTATES];
     set(x0, observations, NSTATES, 1);
 
-    for (int k = 0; k < 10; ++k) {
+    // 1. Update measurement
+    // an alternative method is to use tiny::x.setCol(x0.data[0], 0);
+    set_col((tinytype*)tiny::x, x0, 0, NSTATES, NHORIZON);
 
-        // Print states array to CSV file
-        // calculate the value of (x0 - tiny::Xref.col(1)).norm()
-        float xref_col[NSTATES];
-        get_col((tinytype*)tiny::Xref, xref_col, 1, NSTATES, NHORIZON);
-        matsub(x0, xref_col, v1, 1, NSTATES);
-        float norm = matnorm(v1, 1, NSTATES);
-        // printf("Tracking error: %0.7f\n", norm);
+    // 2. Update reference (if needed)
+    // set((tinytype*)tiny::Xref, (tinytype*) (Xref_total + k * NSTATES), NSTATES, NHORIZON);
 
-        // 1. Update measurement
-        // an alternative method is to use tiny::x.setCol(x0.data[0], 0);
-        set_col((tinytype*)tiny::x, x0, 0, NSTATES, NHORIZON);
+    // 3. Reset dual variables (if needed)
+    // set((tinytype*)tiny::y, 0.0, NINPUTS, NHORIZON-1);
+    // set((tinytype*)tiny::g, 0.0, NSTATES, NHORIZON);
 
-        // 2. Update reference (if needed)
-        set((tinytype*)tiny::Xref, (tinytype*) (Xref_total + k * NSTATES), NSTATES, NHORIZON);
+    // 4. Solve MPC problem
+    tiny_solve();
+    float u_col_0[NINPUTS];
+    get_col((tinytype*)tiny::u, u_col_0, 0, NINPUTS, NHORIZON-1);
 
-        // 3. Reset dual variables (if needed)
-        set((tinytype*)tiny::y, 0.0, NINPUTS, NHORIZON-1);
-        set((tinytype*)tiny::g, 0.0, NSTATES, NHORIZON);
-
-        // 4. Solve MPC problem
-        tiny_solve();
-        float u_col_0[NINPUTS];
-        get_col((tinytype*)tiny::u, u_col_0, 0, NINPUTS, NHORIZON-1);
-
-        // print to terminal for simulator to capture output
-        printf ("%f %f %f %f\n", u_col_0[0], u_col_0[1], u_col_0[2], u_col_0[3]);
-        
-        return 0;
-    }
+    // print to terminal for simulator to capture output
+    printf ("%f %f %f %f\n", u_col_0[0], u_col_0[1], u_col_0[2], u_col_0[3]);
+    
+    return 0;
 }
 
 } /* extern "C" */

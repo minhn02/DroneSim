@@ -5,17 +5,9 @@
 
 // u1 = x[:, i] * Kinf; u2 = u1 + d; u[:, i] = -u2
 void forward_pass_1(int i) {
-    tinytype x_col[NSTATES];
-    get_col((tinytype*)tiny::x, x_col, i, NSTATES, NHORIZON);
-    tinytype d_col[NINPUTS];
-    get_col((tinytype*)tiny::d, d_col, i, NINPUTS, NHORIZON-1);
-    tinytype u_col[NINPUTS];
-    get_col((tinytype*)tiny::u, u_col, i, NINPUTS, NHORIZON-1);
-
-    matvec((tinytype*)tiny::Kinf, x_col, tiny::u1, NINPUTS, NSTATES);
-    matadd(tiny::u1, d_col, tiny::u2, 1, NINPUTS);
-    matneg(tiny::u2, u_col, 1, NINPUTS);
-    set_col((tinytype*)tiny::u, u_col, i, NINPUTS, NHORIZON-1);
+    matvec((tinytype*)tiny::Kinf, tiny::x[i], tiny::u1, NINPUTS, NSTATES);
+    matadd(tiny::u1, tiny::d[i], tiny::u2, 1, NINPUTS);
+    matneg(tiny::u2, tiny::u[i], 1, NINPUTS);
 }
 
 // x[:, i+1] = Adyn * x[:, i] + Bdyn * u[:, i]
@@ -240,7 +232,6 @@ int tiny_solve()
     update_slack();
     update_dual();
     update_linear_cost();
-    
     
     for (int i = 0; i < tiny::max_iter; i++)
     {

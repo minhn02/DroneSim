@@ -23,23 +23,23 @@ void tracking(float* observations, float* inputs)
 #pragma HLS INTERFACE m_axi port = observations bundle = gmem0
 #pragma HLS INTERFACE m_axi port = inputs bundle = gmem1
 
-#pragma HLS array_partition variable=tiny::Adyn type=complete dim=2
-#pragma HLS array_partition variable=tiny::AdynT type=complete dim=2
-#pragma HLS array_partition variable=tiny::Bdyn type=complete dim=2
-#pragma HLS array_partition variable=tiny::Xref type=complete dim=2
-#pragma HLS array_partition variable=tiny::PinfT type=complete dim=2
-#pragma HLS array_partition variable=tiny::KinfT type=complete dim=2
-#pragma HLS array_partition variable=tiny::Kinf type=complete dim=2
-#pragma HLS array_partition variable=tiny::Quu_inv type=complete dim=2
-#pragma HLS array_partition variable=tiny::u_min type=complete dim=1
-#pragma HLS array_partition variable=tiny::u_max type=complete dim=1
-#pragma HLS array_partition variable=tiny::x_min type=complete dim=1
-#pragma HLS array_partition variable=tiny::x_max type=complete dim=1
-#pragma HLS array_partition variable=tiny::x type=complete dim=1
-#pragma HLS array_partition variable=tiny::u type=complete dim=1
-#pragma HLS array_partition variable=tiny::y type=complete dim=1
-#pragma HLS array_partition variable=tiny::g type=complete dim=1
-#pragma HLS array_partition variable=tiny::p type=complete dim=1
+// #pragma HLS array_partition variable=tiny::Adyn type=complete dim=2
+// #pragma HLS array_partition variable=tiny::AdynT type=complete dim=2
+// #pragma HLS array_partition variable=tiny::Bdyn type=complete dim=2
+// #pragma HLS array_partition variable=tiny::Xref type=complete dim=2
+// #pragma HLS array_partition variable=tiny::PinfT type=complete dim=2
+// #pragma HLS array_partition variable=tiny::KinfT type=complete dim=2
+// #pragma HLS array_partition variable=tiny::Kinf type=complete dim=2
+// #pragma HLS array_partition variable=tiny::Quu_inv type=complete dim=2
+// #pragma HLS array_partition variable=tiny::u_min type=complete dim=1
+// #pragma HLS array_partition variable=tiny::u_max type=complete dim=1
+// #pragma HLS array_partition variable=tiny::x_min type=complete dim=1
+// #pragma HLS array_partition variable=tiny::x_max type=complete dim=1
+// #pragma HLS array_partition variable=tiny::x type=complete dim=1
+// #pragma HLS array_partition variable=tiny::u type=complete dim=1
+// #pragma HLS array_partition variable=tiny::y type=complete dim=1
+// #pragma HLS array_partition variable=tiny::g type=complete dim=1
+// #pragma HLS array_partition variable=tiny::p type=complete dim=1
 
     // Map array from problem_data (array in row-major order)
     tiny::rho = rho_value;
@@ -78,48 +78,44 @@ void tracking(float* observations, float* inputs)
     tiny::en_state_bound = 1;
 
 
-    tinytype v1[NSTATES];
-    tinytype v2[NSTATES];
+    // tinytype v1[NSTATES];
+    // tinytype v2[NSTATES];
 
     tinytype Xref_total[NSTATES][NTOTAL];
-
     set((tinytype*)Xref_total, Xref_data, NSTATES, NTOTAL);
     matsetv((tinytype*)tiny::Xref, (tinytype*)Xref_data, NHORIZON, NSTATES);
 
-    // current and next simulation states
+    // // current state
     float x0[NSTATES];
     set(x0, observations, NSTATES, 1);
 
-    for (int k = 0; k < 10; ++k) {
 
-        // Print states array to CSV file
-        // calculate the value of (x0 - tiny::Xref.col(1)).norm()
-        float xref_col[NSTATES];
-        get_col((tinytype*)tiny::Xref, xref_col, 1, NSTATES, NHORIZON);
-        matsub(x0, xref_col, v1, 1, NSTATES);
-        float norm = matnorm(v1, 1, NSTATES);
-        // printf("Tracking error: %0.7f\n", norm);
+    // Print states array to CSV file
+    // calculate the value of (x0 - tiny::Xref.col(1)).norm()
+    // float xref_col[NSTATES];
+    // get_col((tinytype*)tiny::Xref, xref_col, 1, NSTATES, NHORIZON);
+    // matsub(x0, xref_col, v1, 1, NSTATES);
+    // float norm = matnorm(v1, 1, NSTATES);
+    // printf("Tracking error: %0.7f\n", norm);
 
-        // 1. Update measurement
-        // an alternative method is to use tiny::x.setCol(x0.data[0], 0);
-        set_col((tinytype*)tiny::x, x0, 0, NSTATES, NHORIZON);
+    // 1. Update measurement
+    // an alternative method is to use tiny::x.setCol(x0.data[0], 0);
+    set_col((tinytype*)tiny::x, x0, 0, NSTATES, NHORIZON);
 
-        // 2. Update reference (if needed)
-        set((tinytype*)tiny::Xref, (tinytype*) (Xref_total + k * NSTATES), NSTATES, NHORIZON);
+    // 2. Update reference (if needed)
+    // set((tinytype*)tiny::Xref, (tinytype*) (Xref_total + k * NSTATES), NSTATES, NHORIZON);
 
-        // 3. Reset dual variables (if needed)
-        set((tinytype*)tiny::y, 0.0, NINPUTS, NHORIZON-1);
-        set((tinytype*)tiny::g, 0.0, NSTATES, NHORIZON);
+    // 3. Reset dual variables (if needed)
+    // set((tinytype*)tiny::y, 0.0, NINPUTS, NHORIZON-1);
+    // set((tinytype*)tiny::g, 0.0, NSTATES, NHORIZON);
 
-        // 4. Solve MPC problem
-        tiny_solve();
-        float u_col_0[NINPUTS];
-        get_col((tinytype*)tiny::u, u_col_0, 0, NINPUTS, NHORIZON-1);
-        for (int i = 0; i < NINPUTS; i++) {
-            inputs[i] = u_col_0[i];
-        }
-        return;
-    }
+    // 4. Solve MPC problem
+    tiny_solve();
+    
+    inputs[0] = tiny::u[0][0];
+    inputs[1] = tiny::u[0][1];
+    inputs[2] = tiny::u[0][2];
+    inputs[3] = tiny::u[0][3];
 }
 
 } /* extern "C" */

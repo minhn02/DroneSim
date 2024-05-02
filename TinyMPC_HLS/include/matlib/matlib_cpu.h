@@ -129,7 +129,7 @@ inline void matmul_cpu(float *a, float *b, float *c, int n, int m, int o) {
  *    9 8 7 6     5 j
  *                4
  */
-inline void matvec_cpu(float *a, float *b, float *c, int n, int m) {
+inline void matvec_cpu(float a[], float b[], float c[], int n, int m) {
     for (int i = 0; i < n; ++i) {
         c[i] = 0;
         for (int j = 0; j < m; ++j) {

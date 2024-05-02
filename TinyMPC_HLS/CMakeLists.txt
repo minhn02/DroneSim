@@ -14,10 +14,12 @@ include_directories(include/tinympc)
 add_subdirectory(src)
 add_subdirectory(examples)
 
-include_directories(${CMAKE_BINARY_DIR} SYSTEM hlslib/include ${Vitis_INCLUDE_DIRS} )
+set(XILINX_XRT $ENV{XILINX_XRT})
+link_directories(${XILINX_XRT}/lib)
 
+include_directories(${CMAKE_BINARY_DIR} SYSTEM hlslib/include ${Vitis_INCLUDE_DIRS} ${XILINX_XRT}/include/xrt/)
 add_executable(trackingHost src/trackingHost.cpp)
-target_link_libraries(trackingHost ${Vitis_LIBRARIES})
+target_link_libraries(trackingHost ${Vitis_LIBRARIES} xrt_coreutil pthread)
 
 # Will populate the "hw", "hw_emu", and "synthesis" targets
 add_vitis_kernel(tracking
