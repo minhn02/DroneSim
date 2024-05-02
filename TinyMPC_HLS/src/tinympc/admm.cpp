@@ -274,7 +274,7 @@ int tiny_solve()
 
         // Save previous slack variables
         set((tinytype*)tiny::v, (tinytype*)tiny::vnew, NSTATES, NHORIZON);
-        set((tinytype*)tiny::z, (tinytype*)tiny::znew, NSTATES, NHORIZON);
+        set((tinytype*)tiny::z, (tinytype*)tiny::znew, NINPUTS, NHORIZON-1);
 
         tiny::iter += 1;
     }

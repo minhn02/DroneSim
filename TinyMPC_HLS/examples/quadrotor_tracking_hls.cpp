@@ -23,16 +23,23 @@ void tracking(float* observations, float* inputs)
 #pragma HLS INTERFACE m_axi port = observations bundle = gmem0
 #pragma HLS INTERFACE m_axi port = inputs bundle = gmem1
 
-#pragma HLS array_partition variable=tiny::Adyn type=block factor=4
-#pragma HLS array_partition variable=tiny::AdynT type=block factor=4
-#pragma HLS array_partition variable=tiny::Bdyn type=block factor=4
-#pragma HLS array_partition variable=tiny::Xref type=block factor=4
-#pragma HLS array_partition variable=tiny::PinfT type=block factor=4
-#pragma HLS array_partition variable=tiny::KinfT type=block factor=4
-#pragma HLS array_partition variable=tiny::Kinf type=block factor=4
-#pragma HLS array_partition variable=tiny::Quu_inv type=block factor=4
-#pragma HLS array_partition variable=Kinf_data type=block factor=4
-
+#pragma HLS array_partition variable=tiny::Adyn type=complete dim=2
+#pragma HLS array_partition variable=tiny::AdynT type=complete dim=2
+#pragma HLS array_partition variable=tiny::Bdyn type=complete dim=2
+#pragma HLS array_partition variable=tiny::Xref type=complete dim=2
+#pragma HLS array_partition variable=tiny::PinfT type=complete dim=2
+#pragma HLS array_partition variable=tiny::KinfT type=complete dim=2
+#pragma HLS array_partition variable=tiny::Kinf type=complete dim=2
+#pragma HLS array_partition variable=tiny::Quu_inv type=complete dim=2
+#pragma HLS array_partition variable=tiny::u_min type=complete dim=1
+#pragma HLS array_partition variable=tiny::u_max type=complete dim=1
+#pragma HLS array_partition variable=tiny::x_min type=complete dim=1
+#pragma HLS array_partition variable=tiny::x_max type=complete dim=1
+#pragma HLS array_partition variable=tiny::x type=complete dim=1
+#pragma HLS array_partition variable=tiny::u type=complete dim=1
+#pragma HLS array_partition variable=tiny::y type=complete dim=1
+#pragma HLS array_partition variable=tiny::g type=complete dim=1
+#pragma HLS array_partition variable=tiny::p type=complete dim=1
 
     // Map array from problem_data (array in row-major order)
     tiny::rho = rho_value;

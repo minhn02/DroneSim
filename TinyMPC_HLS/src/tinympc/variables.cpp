@@ -81,3 +81,33 @@ tinytype s1[NHORIZON][NSTATES];
 tinytype s2[NHORIZON][NSTATES];
 
 }
+
+void get_col(tinytype* in, tinytype *out, int col, int rows, int cols) {    
+    for (int i = 0; i < rows; i++) {
+        #pragma HLS unroll factor=4
+        out[i] = in[col * rows + i];
+    }
+}
+
+void set_col(tinytype* a, tinytype* data, int col, int rows, int cols) {
+    for (int i = 0; i < rows; i++) {
+        #pragma HLS unroll factor=4
+        a[col * rows + i] = data[i];
+    }
+}
+
+void set(tinytype* a, tinytype* data, int rows, int cols) {
+    for (int i = 0; i < rows * cols; i++) {
+        a[i] = data[i];
+        if (i == 144) {
+            return;
+        }
+    }
+}
+
+void set(tinytype* a, tinytype data, int rows, int cols) {
+    for (int i = 0; i < rows * cols; i++) {
+        #pragma HLS unroll factor=4
+        a[i] = data;
+    }
+}

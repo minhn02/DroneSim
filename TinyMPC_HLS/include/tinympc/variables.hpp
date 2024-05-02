@@ -86,33 +86,9 @@ extern tinytype s2[NHORIZON][NSTATES];
 }
 
 // Nice Functions
-inline void get_col(tinytype* in, tinytype *out, int col, int rows, int cols) {    
-    for (int i = 0; i < rows; i++) {
-        #pragma HLS unroll factor=4
-        out[i] = in[col * rows + i];
-    }
-}
-
-inline void set_col(tinytype* a, tinytype* data, int col, int rows, int cols) {
-    for (int i = 0; i < rows; i++) {
-        #pragma HLS unroll factor=4
-        a[col * rows + i] = data[i];
-    }
-}
-
-inline void set(tinytype* a, tinytype* data, int rows, int cols) {
-    for (int i = 0; i < rows * cols; i++) {
-        #pragma HLS unroll factor=4
-        #pragma HLS loop_tripcount min=rows*cols max=rows*cols
-        a[i] = data[i];
-    }
-}
-
-inline void set(tinytype* a, tinytype data, int rows, int cols) {
-    for (int i = 0; i < rows * cols; i++) {
-        #pragma HLS unroll factor=4
-        a[i] = data;
-    }
-}
+void get_col(tinytype* in, tinytype *out, int col, int rows, int cols);
+void set_col(tinytype* a, tinytype* data, int col, int rows, int cols);
+void set(tinytype* a, tinytype* data, int rows, int cols);
+void set(tinytype* a, tinytype data, int rows, int cols);
 
 #endif

@@ -1,14 +1,8 @@
-#include <algorithm>
-#include <cmath>
 #include <iostream>
-#include <random>
 #include <vector>
 
 #include "hlslib/xilinx/OpenCL.h"
 #include "hlslib/xilinx/Utility.h"
-#include "hlslib/xilinx/DataPack.h"
-#include "hlslib/xilinx/Stream.h"
-using hlslib::Stream;
 
 int main(int argc, char **argv) {
 
@@ -29,8 +23,11 @@ int main(int argc, char **argv) {
         auto program = context.MakeProgram(path);
 
         std::cout << "Initializing device memory...\n" << std::flush;
-        auto observation_device = context.MakeBuffer<float, hlslib::ocl::Access::read>(hlslib::ocl::StorageType::DDR, 1, 12);
-        auto input_device = context.MakeBuffer<float, hlslib::ocl::Access::write>(hlslib::ocl::StorageType::DDR, 1, 4);
+        auto observation_device = context.MakeBuffer<float, hlslib::ocl::Access::read>(hlslib::ocl::MemoryBank::bank1, observation.cbegin(), observation.cend());
+        auto input_device = context.MakeBuffer<float, hlslib::ocl::Access::write>(hlslib::ocl::MemoryBank::bank1, quad_input.cbegin(), quad_input.cbegin());
+
+        observation_device.CopyFromHost(observation.cbegin());
+        input_device.CopyFromHost(quad_input.cbegin());
 
         std::cout << "Creating kernel...\n" << std::flush;
         auto kernel = program.MakeKernel("tracking", observation_device, input_device);

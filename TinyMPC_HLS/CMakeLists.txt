@@ -22,6 +22,10 @@ target_link_libraries(trackingHost ${Vitis_LIBRARIES})
 # Will populate the "hw", "hw_emu", and "synthesis" targets
 add_vitis_kernel(tracking
                  FILES examples/quadrotor_tracking_hls.cpp src/matlib/matlib.cpp src/tinympc/admm.cpp src/tinympc/variables.cpp
-                 INCLUDE_DIRS include hlslib/include include/tinympc include/matlib)
+                 INCLUDE_DIRS include hlslib/include include/tinympc include/matlib examples)
 
-add_vitis_program(tracking xilinx_u250_gen3x16_xdma_4_1_202210_1)
+add_vitis_program(tracking 
+                  xilinx_u250_gen3x16_xdma_4_1_202210_1
+                  CLOCK 400
+                  DEBUGGING ON
+                  PROFILING ON)
