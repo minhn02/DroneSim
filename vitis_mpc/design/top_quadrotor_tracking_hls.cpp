@@ -19,10 +19,16 @@
 extern "C"
 {
 
-void tracking(float* observations, float* inputs)
+void tracking(float observations[12], float inputs[4])
 {
-#pragma HLS INTERFACE m_axi port = observations bundle = gmem0 depth=5
-#pragma HLS INTERFACE m_axi port = inputs bundle = gmem1 depth=5
+//#pragma HLS INTERFACE s_axilite port=observations
+//#pragma HLS INTERFACE s_axilite port=inputs
+
+//#pragma HLS INTERFACE mode=m_axi bundle=BUS_A port=inputs
+//#pragma HLS INTERFACE mode=m_axi bundle=BUS_A port=observations
+#pragma HLS INTERFACE mode=s_axilite port=inputs
+#pragma HLS INTERFACE mode=s_axilite port=observations
+#pragma HLS INTERFACE mode=s_axilite port=return
 
 // #pragma HLS array_partition variable=tiny::Adyn type=complete dim=2
 // #pragma HLS array_partition variable=tiny::AdynT type=complete dim=2
