@@ -19,11 +19,18 @@ inline void UnsetEnvironmentVariable(std::string const &key) {
 }
 
 int main(int argc, char **argv) {
-    UnsetEnvironmentVariable("XCL_EMULATION_MODE");
-    SetEnvironmentVariable("XCL_EMULATION_MODE", "hw_emu");
 
-    // Read settings
-    std::string binaryFile = "tracking_hw_emu.xclbin";
+    bool emulation = false;
+    std::string binaryFile;
+    UnsetEnvironmentVariable("XCL_EMULATION_MODE");
+	
+    if (emulation) {
+      	SetEnvironmentVariable("XCL_EMULATION_MODE", "hw_emu");
+		    binaryFile = "tracking_hw_emu.xclbin";
+    } else {
+		binaryFile = "tracking_hw.xclbin";
+	}
+
     int device_index = 0;
 
     std::cout << "Open the device" << device_index << std::endl;
@@ -45,7 +52,7 @@ int main(int argc, char **argv) {
 
     // Create the test data
     for (int i = 0; i < 12; ++i) {
-        boObs_map[i] = i;
+        boObs_map[i] = 0;
         boResult_map[i] = 0;
     }
 

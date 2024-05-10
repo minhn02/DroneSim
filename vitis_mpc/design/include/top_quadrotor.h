@@ -1,5 +1,5 @@
 
 
 extern "C" {
-void tracking(float* observations, float* inputs);
+void tracking(float* observations, float* inputs, int timestep);
 }

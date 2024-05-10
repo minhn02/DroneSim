@@ -19,34 +19,12 @@
 extern "C"
 {
 
-void tracking(float observations[12], float inputs[4])
+void tracking(float observations[12], float inputs[4], int timestep)
 {
-//#pragma HLS INTERFACE s_axilite port=observations
-//#pragma HLS INTERFACE s_axilite port=inputs
-
-//#pragma HLS INTERFACE mode=m_axi bundle=BUS_A port=inputs
-//#pragma HLS INTERFACE mode=m_axi bundle=BUS_A port=observations
 #pragma HLS INTERFACE mode=s_axilite port=inputs
 #pragma HLS INTERFACE mode=s_axilite port=observations
+#pragma HLS INTERFACE mode=s_axilite port=time
 #pragma HLS INTERFACE mode=s_axilite port=return
-
-// #pragma HLS array_partition variable=tiny::Adyn type=complete dim=2
-// #pragma HLS array_partition variable=tiny::AdynT type=complete dim=2
-// #pragma HLS array_partition variable=tiny::Bdyn type=complete dim=2
-// #pragma HLS array_partition variable=tiny::Xref type=complete dim=2
-// #pragma HLS array_partition variable=tiny::PinfT type=complete dim=2
-// #pragma HLS array_partition variable=tiny::KinfT type=complete dim=2
-// #pragma HLS array_partition variable=tiny::Kinf type=complete dim=2
-// #pragma HLS array_partition variable=tiny::Quu_inv type=complete dim=2
-// #pragma HLS array_partition variable=tiny::u_min type=complete dim=1
-// #pragma HLS array_partition variable=tiny::u_max type=complete dim=1
-// #pragma HLS array_partition variable=tiny::x_min type=complete dim=1
-// #pragma HLS array_partition variable=tiny::x_max type=complete dim=1
-// #pragma HLS array_partition variable=tiny::x type=complete dim=1
-// #pragma HLS array_partition variable=tiny::u type=complete dim=1
-// #pragma HLS array_partition variable=tiny::y type=complete dim=1
-// #pragma HLS array_partition variable=tiny::g type=complete dim=1
-// #pragma HLS array_partition variable=tiny::p type=complete dim=1
 
     // Map array from problem_data (array in row-major order)
     tiny::rho = rho_value;
@@ -90,7 +68,7 @@ void tracking(float observations[12], float inputs[4])
 
     tinytype Xref_total[NSTATES][NTOTAL];
     set((tinytype*)Xref_total, Xref_data, NSTATES, NTOTAL);
-    matsetv((tinytype*)tiny::Xref, (tinytype*)Xref_data, NHORIZON, NSTATES);
+    matsetv((tinytype*)tiny::Xref, (tinytype*)Xref_data + timestep*NSTATES, NHORIZON, NSTATES);
 
     // // current state
     float x0[NSTATES];

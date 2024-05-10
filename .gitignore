@@ -2,3 +2,5 @@
 build
 integration/results
 .vscode
+
+__pycache__

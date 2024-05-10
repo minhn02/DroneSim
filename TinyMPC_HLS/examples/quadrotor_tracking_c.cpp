@@ -14,7 +14,7 @@
 #include "matlib_cpu.h"
 #include "tinympc/glob_opts.hpp"
 #include "problem_data/quadrotor_20hz_params.hpp"
-#include "trajectory_data/quadrotor_20hz_y_axis_line.hpp"
+#include "trajectory_data/quadrotor_50hz_circle.hpp"
 #include "tinympc/variables.hpp"
 
 extern "C"
@@ -27,6 +27,8 @@ int main(int arc, char* argv[])
     for (int i = 0; i < 12; ++i) {
         observations[i] = std::stof(argv[i + 1]);
     }
+
+    int k = std::stoi(argv[13]);
 
     // Map array from problem_data (array in row-major order)
     tiny::rho = rho_value;
@@ -67,7 +69,7 @@ int main(int arc, char* argv[])
     tinytype Xref_total[NSTATES][NTOTAL];
 
     set((tinytype*)Xref_total, Xref_data, NSTATES, NTOTAL);
-    matsetv((tinytype*)tiny::Xref, (tinytype*)Xref_data, NHORIZON, NSTATES);
+    matsetv((tinytype*)tiny::Xref, (tinytype*)Xref_data + k * NSTATES, NHORIZON, NSTATES);
 
     // current and next simulation states
     float x0[NSTATES];

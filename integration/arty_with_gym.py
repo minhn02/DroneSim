@@ -37,6 +37,7 @@ from gym_pybullet_drones.utils.utils import sync, str2bool
 import time
 import subprocess
 
+from arty_wrapper import ArtyAgent
 
 NOISE = False
 
@@ -52,20 +53,17 @@ DEFAULT_OBSTACLES = True
 #DEFAULT_SIMULATION_FREQ_HZ = 240
 #DEFAULT_CONTROL_FREQ_HZ = 48
 DEFAULT_SIMULATION_FREQ_HZ = 400
-DEFAULT_CONTROL_FREQ_HZ = 50
+DEFAULT_CONTROL_FREQ_HZ = 20
 #DEFAULT_DURATION_SEC = 12
 DEFAULT_DURATION_SEC = 5
 DEFAULT_OUTPUT_FOLDER = 'results'
 DEFAULT_COLAB = False
 
-def run_tinympc_system(observation, i):
-    base_command = "../TinyMPC_HLS/build/examples/quadrotor_tracking"
-    # base_command = "../TinyMPC/build/examples/quadrotor_hovering"
+arty = ArtyAgent()
+
+def run_arty(observation):
     formated_obs = extract_state_inputs(observation)
-    full_command = f"{base_command} {formated_obs} {i}"
-    result = subprocess.run(full_command, shell=True, text=True, capture_output=True)
-    print(f"RESULT {type(result)} {result}")
-    return result.stdout
+    return arty.act(formated_obs)
 
 # Convert observation to string and send. 
 # TinyMPC: x,y,z Rodriguez parameters
@@ -106,14 +104,11 @@ def extract_state_inputs(observation):
     return formatted_state_string
 def calculate_rpm(env, command_output_thrusts):
     """Read the action returned from the TinyMPC"""
-    normalized_thrusts_string = get_action_from_command(command_output_thrusts)
-
-    normalized_thrusts = parse_string_to_numbers(normalized_thrusts_string)
-    print(f"======= Normalized thrusts {normalized_thrusts}" )
+    print(f"======= Normalized thrusts {command_output_thrusts}" )
     
     # normalized_forces is the normalized motor thrust 0-1 with 1 ~ 65535 pwm ~ 60 grams ~ 0.59 N, First, muliply by  0.59N and then add the 0.0662N hover force for each prop when simulating our drone.
     max_thrust_N = 0.58/4 # Max thrust in Newtons corresponding to normalized value 1
-    actual_thrusts = (normalized_thrusts + 0.583) * max_thrust_N
+    actual_thrusts = (command_output_thrusts + 0.583) * max_thrust_N
 
     # Clip negative thrust values to 0
     actual_thrusts_clipped = np.clip(actual_thrusts, 0, None)    
@@ -126,16 +121,7 @@ def calculate_rpm(env, command_output_thrusts):
     return rpm
 
 def get_action_from_command(output):
-
-    # Split the output into lines and get the last line
-    lines = output.strip().split('\n')
-    last_line = lines[-1]
-
-    # Extract the numbers from the last line
-    numbers_str = last_line.split()[-4:]  # Split the last line and take the last 4 elements
-    numbers = [float(num) for num in numbers_str]
-
-    return np.array(numbers)
+    return output
 
 # def calculate_rpm(forces, env):
 #     """
@@ -249,7 +235,8 @@ def run(
         #### Step the simulation ###################################
         obs, _, _, _, _ = env.step(action)
         print(f"obs: {obs}")
-        forces_string = run_tinympc_system(obs, i)
+        forces_string = run_arty(obs)
+        forces_string = np.array(forces_string)
         print(f"=========== forces {forces_string}")
         rpm = calculate_rpm(env, forces_string)
         print(f"=========== RPM {rpm}")
