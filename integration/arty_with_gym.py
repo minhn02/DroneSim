@@ -53,7 +53,7 @@ DEFAULT_OBSTACLES = True
 #DEFAULT_SIMULATION_FREQ_HZ = 240
 #DEFAULT_CONTROL_FREQ_HZ = 48
 DEFAULT_SIMULATION_FREQ_HZ = 400
-DEFAULT_CONTROL_FREQ_HZ = 20
+DEFAULT_CONTROL_FREQ_HZ = 50
 #DEFAULT_DURATION_SEC = 12
 DEFAULT_DURATION_SEC = 5
 DEFAULT_OUTPUT_FOLDER = 'results'
@@ -61,9 +61,11 @@ DEFAULT_COLAB = False
 
 arty = ArtyAgent()
 
-def run_arty(observation):
+def run_arty(observation, timestep):
     formated_obs = extract_state_inputs(observation)
-    return arty.act(formated_obs)
+    for i in range(12):
+        formated_obs[i] = round(formated_obs[i], 10)
+    return arty.act(formated_obs, timestep)
 
 # Convert observation to string and send. 
 # TinyMPC: x,y,z Rodriguez parameters
@@ -101,7 +103,7 @@ def extract_state_inputs(observation):
 
     formatted_state_string = f"{x} {y} {z} {r1} {r2} {r3} {vx} {vy} {vz} {dphi} {dtheta} {dpsi}"
     # print (f"Formatted_State_String =========== {type(formatted_state_string)} {formatted_state_string}")
-    return formatted_state_string
+    return [x, y, z, r1, r2, r3, vx, vy, vz, dphi, dtheta, dpsi]
 def calculate_rpm(env, command_output_thrusts):
     """Read the action returned from the TinyMPC"""
     print(f"======= Normalized thrusts {command_output_thrusts}" )
@@ -235,7 +237,7 @@ def run(
         #### Step the simulation ###################################
         obs, _, _, _, _ = env.step(action)
         print(f"obs: {obs}")
-        forces_string = run_arty(obs)
+        forces_string = run_arty(obs, i)
         forces_string = np.array(forces_string)
         print(f"=========== forces {forces_string}")
         rpm = calculate_rpm(env, forces_string)

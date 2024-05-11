@@ -6,7 +6,8 @@
 int tracking_tb(){
     float obs[12] = {0};
     float inputs[4] = {0};
-    tracking(obs, inputs);
+    int time = 0;
+    tracking(obs, inputs, time);
 
     printf("inputs: %f %f %f %f", inputs[0], inputs[1], inputs[2], inputs[3]);
 

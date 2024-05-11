@@ -12,7 +12,7 @@
 #include "include/matlib.h"
 #include "include/glob_opts.hpp"
 #include "include/quadrotor_20hz_params.hpp"
-#include "include/quadrotor_20hz_y_axis_line.hpp"
+#include "include/quadrotor_50hz_circle.hpp"
 #include "include/variables.hpp"
 #include "include/top_quadrotor.h"
 
@@ -23,7 +23,7 @@ void tracking(float observations[12], float inputs[4], int timestep)
 {
 #pragma HLS INTERFACE mode=s_axilite port=inputs
 #pragma HLS INTERFACE mode=s_axilite port=observations
-#pragma HLS INTERFACE mode=s_axilite port=time
+#pragma HLS INTERFACE mode=s_axilite port=timestep
 #pragma HLS INTERFACE mode=s_axilite port=return
 
     // Map array from problem_data (array in row-major order)

@@ -10,8 +10,10 @@ class ArtyAgent:
         self.connection = None
         self.connect()
 
-    def send_observation(self, observation):
-        self.connection.write(f"{observation[0]} {observation[1]} {observation[2]} {observation[3]} {observation[4]} {observation[5]} {observation[6]} {observation[7]} {observation[8]} {observation[9]} {observation[10]} {observation[11]}\n".encode())
+    def send_observation(self, observation, timestep):
+        state_str = f"{observation[0]} {observation[1]} {observation[2]} {observation[3]} {observation[4]} {observation[5]} {observation[6]} {observation[7]} {observation[8]} {observation[9]} {observation[10]} {observation[11]} {timestep}\n"
+        print("sending: ", state_str)
+        self.connection.write(state_str.encode())
 
     def read_action(self):
         action_str = self.connection.readline().decode().strip()
@@ -26,8 +28,8 @@ class ArtyAgent:
 
         return float_inputs
 
-    def act(self, state):
-        self.send_observation(state)
+    def act(self, state, timestep):
+        self.send_observation(state, timestep)
         action = self.read_action()
         return action
 
